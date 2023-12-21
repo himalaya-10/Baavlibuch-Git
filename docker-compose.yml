@@ -1,0 +1,51 @@
+version: "3.8"
+services:
+  mongodb:
+    image: "mongo"
+    container_name: Database
+    ports:
+      - "27017:27017"
+    volumes:
+      - data:/data/db
+    networks:
+      - mern-network
+
+  backend:
+    build: ./backend
+    container_name: backend
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+      - django
+    networks:
+      - mern-network
+
+  frontend:
+    build: ./baavlibuch
+    container_name: frontend
+    ports: 
+      - "3000:3000"
+    stdin_open: true
+    tty: true
+    depends_on:
+      - backend
+    networks:
+      - mern-network
+  
+  django:
+    build: ./django
+    command: python manage.py runserver 0.0.0.0:9000
+    container_name: django
+    ports:
+      - "9000:9000"
+    networks:
+      - mern-network
+
+volumes:
+  data:
+
+networks:
+  mern-network:
+    driver: bridge
